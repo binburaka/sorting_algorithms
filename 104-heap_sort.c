@@ -1,41 +1,77 @@
 #include "sort.h"
-/**
-  * heap_sort - heap sort algorithm
-  * @array: array to sort
-  * @size: size of array
-  */
-void heap_sort(int *array, size_t size)
-{
-	int i, tmp;
 
-	for (i = size / 2 - 1; i >= 0; i--)
-		heapify(array, i, size, size);
-	for (i = size -1; i >=0; i--)
+/**
+* sift_down - fixes a heap
+* @array: the heap to be fixed
+* @root: root of heap
+* @end: ;ast index of the heap
+* @size: size of the array
+*/
+void sift_down(int *array, size_t root, size_t end, size_t size)
+{
+	size_t left, right, swap;
+	int temp;
+
+	while ((left = (2 * root) + 1) <= end)
 	{
-		tmp = array[0];
-		array[0] = array[i];
-		array[i] = tmp;
+		swap = root;
+		right = left + 1;
+		if (array[swap] < array[left])
+			swap = left;
+		if (right <= end && array[swap] < array[right])
+			swap = right;
+		if (swap == root)
+			return;
+		temp = array[root];
+		array[root] = array[swap];
+		array[swap] = temp;
 		print_array(array, size);
-		heapify(array, i, 0, size);
+		root = swap;
 	}
 }
-void heapify(int *array, int idx, int idx2, size_t size)
-{
-	int max = idx2;
-	int left = 2 * idx2 + 1;
-	int right = 2 * idx2 + 2;
-	int tmp;
 
-	if (left < idx && array[left] > array[max])
-		max = left;
-	if (right < idx && array[right] > array[max])
-		max = right;
-	if (max != idx2)
+/**
+* make_heap - makes a heap from an unsorted array
+* @array: array to turn into a heap
+* @size: size of the array
+*
+* Return: void
+*/
+void make_heap(int *array, size_t size)
+{
+	size_t parent;
+
+	for (parent = ((size - 1) - 1) / 2; 1; parent--)
 	{
-		tmp = array[idx2];
-		array[idx2] = array[max];
-		array[max] = tmp;
+		sift_down(array, parent, size - 1, size);
+		if (parent == 0)
+			break;
+	}
+}
+
+/**
+* heap_sort - sorts an array of ints in ascending order w/ the Heap sort algo
+* @array: array to sort
+* @size: size of the array
+*
+* Return: void
+*/
+void heap_sort(int *array, size_t size)
+{
+	size_t end;
+	int temp;
+
+	if (array == NULL || size < 2)
+		return;
+	make_heap(array, size);
+	end = size - 1;
+	while (end > 0)
+	{
+		temp = array[end];
+		array[end] = array[0];
+		array[0] = temp;
 		print_array(array, size);
-		heapify(array, idx, max, size);
+		end--;
+		sift_down(array, 0, end, size);
 	}
 }
